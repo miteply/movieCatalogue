@@ -54,6 +54,7 @@ public class RatingServiceImpl implements RatingService {
 
 	@Override
 	public void deleteById(Long ratingId) {
+		findById(ratingId);
 		ratingRepository.deleteById(ratingId);	
 	}
 

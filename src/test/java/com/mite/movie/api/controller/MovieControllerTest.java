@@ -36,9 +36,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mite.movie.api.dto.request.MovieRequest;
 import com.mite.movie.api.dto.request.RatingRequest;
+import com.mite.movie.api.dto.response.DirectorResponse;
 import com.mite.movie.api.dto.response.MovieResponse;
 import com.mite.movie.api.dto.response.RatingResponse;
 import com.mite.movie.core.exception.NotFoundException;
+import com.mite.movie.core.service.DirectorService;
 import com.mite.movie.core.service.MovieService;
 import com.mite.movie.core.util.ObjectConverter;
 import com.mite.movie.database.entity.Movie;
@@ -54,6 +56,8 @@ class MovieControllerTest {
 	
 	@MockBean
 	MovieService movieService;
+	@MockBean
+	DirectorService directorService;
 	
 	private JacksonTester<MovieResponse> jsonMovieResponse;
 	private JacksonTester<MovieRequest> jsonMovieRequest;
@@ -93,6 +97,7 @@ class MovieControllerTest {
 		ratingResponses.add(ratingResponse1);
 		ratingResponses.add(ratingResponse2);
 		actualMovieResponse.setRatings(ratingResponses);
+		actualMovieResponse.setDirectors(new HashSet<DirectorResponse>());
 		
 		titanic = new Movie();
 		titanic.setMovieId(1L);

@@ -1,7 +1,12 @@
 package com.mite.movie.api.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
+/**
+ * Class used to send the JSON payload to the client.
+ * 
+ * @author Mykhaylo.T
+ *
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RatingResponse {
 
@@ -44,6 +49,4 @@ public class RatingResponse {
 	public void setMovieId(Long movieId) {
 		this.movieId = movieId;
 	}
-	
-	
 }

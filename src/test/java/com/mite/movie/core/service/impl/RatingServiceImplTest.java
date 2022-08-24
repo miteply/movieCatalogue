@@ -144,6 +144,8 @@ class RatingServiceImplTest {
 	@DisplayName("Test to delete rating by id")
 	@Test
 	void should_delete_movie_by_id() {
+		Mockito.doNothing().when(movieRepository).deleteById(anyLong());
+		Mockito.when(ratingRepository.findById(anyLong())).thenReturn(Optional.of(rating1));
 		
 		ratingService.deleteById(1L);
 		

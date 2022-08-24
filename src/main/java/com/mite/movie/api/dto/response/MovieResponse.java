@@ -1,5 +1,6 @@
 package com.mite.movie.api.dto.response;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 /**
@@ -20,6 +21,8 @@ public class MovieResponse {
 	private Integer releaseDate;
 	
 	private List<RatingResponse> ratings;
+	
+	private Set<DirectorResponse> directors;
 
 	public Long getMovieId() {
 		return movieId;
@@ -60,7 +63,12 @@ public class MovieResponse {
 	public void setRatings(List<RatingResponse> ratings) {
 		this.ratings = ratings;
 	}
-	
-	
 
+	public Set<DirectorResponse> getDirectors() {
+		return directors;
+	}
+
+	public void setDirectors(Set<DirectorResponse> directors) {
+		this.directors = directors;
+	}
 }

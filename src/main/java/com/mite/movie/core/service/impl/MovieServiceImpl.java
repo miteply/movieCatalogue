@@ -16,6 +16,7 @@ import com.mite.movie.core.service.MovieService;
 import com.mite.movie.core.service.RatingService;
 import com.mite.movie.database.entity.Movie;
 import com.mite.movie.database.entity.Rating;
+import com.mite.movie.database.repository.DirectorRepository;
 import com.mite.movie.database.repository.MovieRepository;
 /**
  * Class that implements {@link MovieService} interface, to handle the logic 
@@ -32,11 +33,14 @@ public class MovieServiceImpl implements MovieService {
 
 	private final MovieRepository movieRepository;
 	private final RatingService ratingService;
+	private final DirectorRepository directorRepository;
 	
-	public MovieServiceImpl(MovieRepository movieRepository, RatingService ratingService) {
+	public MovieServiceImpl(MovieRepository movieRepository, RatingService ratingService,
+							DirectorRepository directorRepository) {
 
 		this.movieRepository = movieRepository;
 		this.ratingService = ratingService;
+		this.directorRepository = directorRepository;
 	}
 	
 	@Override
@@ -50,7 +54,7 @@ public class MovieServiceImpl implements MovieService {
 	@Override
 	public Movie update(Long movieId, Movie request) {
 		LOG.info("Updating movie with id: {}", movieId);
-		return movieRepository.save(updateMovieWithNewValues(findById(movieId), request));
+		return save(updateMovieWithNewValues(findById(movieId), request));
 	}
 
 	@Override
@@ -76,14 +80,18 @@ public class MovieServiceImpl implements MovieService {
 	@Override
 	public void deleteById(Long movieId) {
 		LOG.info("Deleting movie with id: {}", movieId);
-		findById(movieId);
+		Movie movie = findById(movieId);
+		movie.getDirectors().stream()
+								.forEach(dir-> {
+									dir.removeMovie(movie);
+								    directorRepository.save(dir);});
 		movieRepository.deleteById(movieId);
 	}
 
 	@Override
 	public void deleteAll() {
 		LOG.info("Deleting all movies.");
-		movieRepository.deleteAll();
+		movieRepository.findAll().forEach(entity -> deleteById(entity.getMovieId()));
 	}
 
 	@Override

@@ -1,7 +1,9 @@
 package com.mite.movie.database.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,6 +42,9 @@ public class Movie {
 	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, orphanRemoval = true)
 	@JoinColumn(name="fk_movieId")
 	List<Rating> ratings = new ArrayList<>();
+	
+	@ManyToMany(mappedBy = "movies")
+	Set<Director> directors = new HashSet<>();
 	
 	public Movie() {}
 	
@@ -87,6 +93,24 @@ public class Movie {
 	public void setRatings(List<Rating> ratings) {
 		this.ratings = ratings;
 	}
+	
+	public Set<Director> getDirectors() {
+		return directors;
+	}
+
+	public void setDirectors(Set<Director> directors) {
+		this.directors = directors;
+	}
+	
+	public void addDirector(Director director) {
+		directors.add(director);
+		director.getMovies().add(this);
+	}
+	
+	public void removeDirector(Director director) {
+		this.directors.remove(director);
+		director.getMovies().remove(this);
+	}
 
 	@Override
 	public int hashCode() {
@@ -114,6 +138,11 @@ public class Movie {
 				return false;
 		} else if (!description.equals(other.description))
 			return false;
+		if (directors == null) {
+			if (other.directors != null)
+				return false;
+		} else if (!directors.equals(other.directors))
+			return false;
 		if (movieId == null) {
 			if (other.movieId != null)
 				return false;
@@ -136,4 +165,5 @@ public class Movie {
 			return false;
 		return true;
 	}
+	
 }

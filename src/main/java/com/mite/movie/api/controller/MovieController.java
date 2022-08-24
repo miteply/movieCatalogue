@@ -3,6 +3,7 @@ package com.mite.movie.api.controller;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mite.movie.api.dto.request.MovieRequest;
 import com.mite.movie.api.dto.response.MovieResponse;
+import com.mite.movie.core.service.DirectorService;
 import com.mite.movie.core.service.MovieService;
 import com.mite.movie.core.util.ObjectConverter;
 import com.mite.movie.database.entity.Movie;
@@ -27,17 +29,22 @@ import com.mite.movie.database.entity.Movie;
 public class MovieController {
 
 	private final MovieService movieService;
+	private final DirectorService directorService;
 	private final ObjectConverter<Object, Object> objectConverter;
 
-	public MovieController(MovieService movieRepository, ObjectConverter<Object, Object> objectConverter) {
+	public MovieController(MovieService movieRepository, DirectorService directorService, ObjectConverter<Object, Object> objectConverter) {
 
 		this.movieService = movieRepository;
+		this.directorService = directorService;
 		this.objectConverter = objectConverter;
 	}
 	
 	@PostMapping 
 	public ResponseEntity<MovieResponse> save(@RequestBody MovieRequest request){
-		return new ResponseEntity<>(convertToDto(movieService.save(convertToEntity(request))), 
+		Movie savedEntity = movieService.save(convertToEntity(request));
+		removeDirectorRecursion(savedEntity);
+		
+		return new ResponseEntity<>(convertToDto(savedEntity), 
 									HttpStatus.CREATED);
 	}
 	
@@ -48,7 +55,7 @@ public class MovieController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<MovieResponse> getById(@PathVariable("id") Long id){
-		return new ResponseEntity<>(convertToDto(movieService.findById(id)), HttpStatus.OK);
+		return new ResponseEntity<>(convertToDto(removeDirectorRecursion(movieService.findById(id))), HttpStatus.OK);
 	}
 	
 	@GetMapping
@@ -56,6 +63,7 @@ public class MovieController {
 		return !Optional.ofNullable(title).isPresent() ?  
 				new ResponseEntity<>(movieService.findAll()
 						.stream()
+							.map(this::removeDirectorRecursion)
 							.map(this::convertToDto)
 							.collect(Collectors.toList()), HttpStatus.OK)  :  
 					new ResponseEntity<>(convertToDto(movieService.findByTitle(title)), HttpStatus.OK);
@@ -90,11 +98,32 @@ public class MovieController {
 														.collect(Collectors.toList()),HttpStatus.OK);
 	}
 	
+	@GetMapping("/directors")
+	public ResponseEntity<List<MovieResponse>> getMoviesByDirectorFullName(
+			@RequestParam(required = true) String firstname, @RequestParam(required = true) String lastname) {
+		
+		List<MovieResponse> collect = directorService.findMoviesByDirectorFullName(firstname, lastname).stream()
+		.map(this::removeDirectorRecursion)
+		.map(this::convertToDto).collect(Collectors.toList());
+		return new ResponseEntity<>(collect, HttpStatus.OK);
+	}
+	
+	
+	
 	
 	private Movie convertToEntity(MovieRequest request) {
 		return (Movie)objectConverter.toEntity(request, Movie.class);
 	}
 	private MovieResponse convertToDto(Movie entity) {
 		return (MovieResponse)objectConverter.toEntity(entity, MovieResponse.class);
-	}	
+	}
+
+	private Movie removeDirectorRecursion(Movie entity) {
+		if (Optional.ofNullable(entity.getDirectors()).isPresent())
+			return Stream.of(entity).map(movie -> {
+				movie.getDirectors().stream().forEach(director -> director.setMovies(null));
+				return movie;
+			}).findFirst().orElse(entity);
+		return entity;
+	}
 }
