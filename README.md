@@ -115,4 +115,4 @@ http://127.0.0.0:8080
 ```
 
 ## Testing with POSTMAN
-Test in POSTMAN by importing the [json file](https://github.com/miteply/movieCatalogue/blob/main/movie_catalogue.postman_collection.json) 
+Test in POSTMAN by importing the [json file](https://github.com/miteply/movieCatalogue/blob/main/uml_diagrams/movie_catalogue.postman_collection.json) 
