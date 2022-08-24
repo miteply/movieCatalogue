@@ -187,6 +187,9 @@ class MovieServiceImplTest {
 	@Test
 	void should_delete_movie_by_id() {
 		
+		Mockito.doNothing().when(movieRepository).deleteById(anyLong());
+		Mockito.when(movieRepository.findById(anyLong())).thenReturn(Optional.of(titanic));
+		
 		movieService.deleteById(1L);
 		
 		verify(movieRepository, times(1)).deleteById(anyLong());;
@@ -221,18 +224,7 @@ class MovieServiceImplTest {
 	@Test
 	void should_find_movies_with_total_ratings_greater_than() {
 		
-		Movie saw = new Movie();
-		saw.setMovieId(4L);
-		saw.setTitle("The Saw");
-		saw.setDescription("Desc SAW");
-		Rating rating = new Rating();
-		rating.setRatingId(6L);
-		rating.setScore(50);
-		rating.setText("Wonderfull");
-		rating.setMovie(saw);
-		saw.getRatings().add(rating);
-		movies.add(saw);
-		
+	
 		Mockito.when(movieRepository.findAll()).thenReturn(movies);
 		
 		List<Movie> moviesWithTotalRatingsGreaterThan = movieService.getMoviesWithTotalRatingsGreaterThan(1);

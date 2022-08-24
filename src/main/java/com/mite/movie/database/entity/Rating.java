@@ -78,7 +78,6 @@ public class Rating {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((movie == null) ? 0 : movie.hashCode());
 		result = prime * result + ((ratingId == null) ? 0 : ratingId.hashCode());
 		result = prime * result + score;
 		result = prime * result + ((text == null) ? 0 : text.hashCode());
