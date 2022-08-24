@@ -43,6 +43,7 @@ public class MovieServiceImpl implements MovieService {
 	@Transactional
 	public Movie save(Movie movie) {
 		LOG.info("Saving movie with title: {}", movie.getTitle());
+		doesTitleExists(movie.getTitle());
 		return movieRepository.save(movie);
 	}
 
@@ -63,7 +64,7 @@ public class MovieServiceImpl implements MovieService {
 	public Movie findByTitle(String movieTitle) {
 		LOG.info("Finding movie with title: {}", movieTitle);
 		return movieRepository.findByTitle(movieTitle)
-				.orElseThrow(() -> new NotFoundException(Movie.class, movieTitle));
+				.orElseThrow(() -> new NotFoundException(Movie.class, movieTitle, ""));
 	}
 
 	@Override
@@ -75,6 +76,7 @@ public class MovieServiceImpl implements MovieService {
 	@Override
 	public void deleteById(Long movieId) {
 		LOG.info("Deleting movie with id: {}", movieId);
+		findById(movieId);
 		movieRepository.deleteById(movieId);
 	}
 
@@ -114,5 +116,10 @@ public class MovieServiceImpl implements MovieService {
 			oldMovie.setReleaseDate(newMovie.getReleaseDate());
 		
 		return oldMovie;
+	}
+	
+	private void doesTitleExists (String title ) {
+		if (movieRepository.findByTitle(title).isPresent()) 
+			throw new NotFoundException(Movie.class, title, "Object [%s] with title [%s] already exists");
 	}
 }

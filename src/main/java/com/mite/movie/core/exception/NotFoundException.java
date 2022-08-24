@@ -17,8 +17,9 @@ public class NotFoundException extends RuntimeException{
 	        super(String.format("Object [%s] with id [%d] not found", object.getSimpleName(), id));
 	}
 	
-	public NotFoundException(@NonNull Class<?> object, String name) {
-        super(String.format("Object [%s] with name [%s] not found", object.getSimpleName(), name));
+	public NotFoundException(@NonNull Class<?> object, String name, String error) {
+        super(String.format(!error.isEmpty() ? error : "Object [%s] with name [%s] not found", 
+        		object.getSimpleName(), name));
     }
 
 }
