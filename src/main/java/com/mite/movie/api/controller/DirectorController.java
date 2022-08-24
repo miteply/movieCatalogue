@@ -89,7 +89,7 @@ public class DirectorController {
 	@DeleteMapping("{directorId}/movies/{movieId}")
 	public ResponseEntity<DirectorResponse> removeDirectorFromMovie(@PathVariable("directorId") Long directorId,
 			@PathVariable ("movieId") Long movieId) {
-		Director directorEntity = directorService.addOrRemoveMovieFromDirector(movieId, directorId, true);
+		Director directorEntity = directorService.addOrRemoveMovieFromDirector(movieId, directorId, false);
 		removeMovieRecursion(directorEntity);
 		
 		return  new ResponseEntity<>(convertToDto(directorEntity),HttpStatus.OK);
